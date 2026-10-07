@@ -99,6 +99,12 @@ a{color:var(--wine)}
   background:var(--wine-tint);
   border-color:var(--wine-tint);
 }
+.viewbar a.tablink{
+  flex:1;min-width:0;text-align:center;text-decoration:none;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);border:1px solid transparent;border-radius:3px;padding:8px 6px;
+}
+.viewbar a.tablink:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
 .viewbar button:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
 
 /* ---- hero ---- */
@@ -401,7 +407,8 @@ footer{
 <nav class="viewbar">
   <div class="wrap" role="tablist" aria-label="Visning">
     <button id="tab-kort" role="tab" aria-selected="true" aria-controls="view-kort">Kort</button>
-    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Hele programmet</button>
+    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Program</button>
+    <a class="tablink" href="spill.html">Leken</a>
   </div>
 </nav>
 
