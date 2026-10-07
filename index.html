@@ -99,9 +99,8 @@ a{color:var(--wine)}
   background:var(--wine-tint);
   border-color:var(--wine-tint);
 }
-.viewbar button,.viewbar a.tablink{flex:1 1 auto;white-space:nowrap}
 .viewbar a.tablink{
-  text-align:center;text-decoration:none;
+  flex:1;min-width:0;text-align:center;text-decoration:none;
   font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--ink-soft);border:1px solid transparent;border-radius:3px;padding:8px 6px;
 }
@@ -408,7 +407,7 @@ footer{
 <nav class="viewbar">
   <div class="wrap" role="tablist" aria-label="Visning">
     <button id="tab-kort" role="tab" aria-selected="true" aria-controls="view-kort">Kort</button>
-    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Lang/detaljert</button>
+    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Detaljert</button>
     <a class="tablink" href="spill.html">Spill</a>
   </div>
 </nav>
