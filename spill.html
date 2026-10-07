@@ -98,7 +98,7 @@ input[type=text]:focus-visible{outline:2px solid var(--wine);outline-offset:1px}
 
 /* ---- stopp korken ---- */
 .track{
-  position:relative;height:64px;border-radius:3px;overflow:hidden;
+  position:relative;height:168px;border-radius:4px;overflow:hidden;
   background:var(--paper);border:1px solid var(--rule);
   touch-action:manipulation;cursor:pointer;
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
@@ -107,8 +107,8 @@ input[type=text]:focus-visible{outline:2px solid var(--wine);outline-offset:1px}
 .zone-wide{width:26%;background:var(--vine-tint)}
 .zone-bull{width:4%;background:var(--wine-tint);border-inline:1px solid var(--wine)}
 .cork{
-  position:absolute;top:7px;bottom:7px;width:10px;left:0;
-  transform:translateX(-50%);border-radius:2px;background:var(--wine);
+  position:absolute;top:12px;bottom:12px;width:14px;left:0;
+  transform:translateX(-50%);border-radius:3px;background:var(--wine);
 }
 .flash{
   min-height:1.5em;margin:10px 0 0;text-align:center;
@@ -128,9 +128,16 @@ canvas{
   display:block;max-width:100%;border:1px solid var(--rule);border-radius:3px;
   background:var(--paper);touch-action:none;
 }
-.pad{display:flex;gap:6px;margin-top:12px}
+.pad{
+  display:grid;grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,60px);
+  gap:6px;justify-content:center;margin-top:16px;
+}
+#s-up{grid-column:2;grid-row:1}
+#s-left{grid-column:1;grid-row:2}
+#s-right{grid-column:3;grid-row:2}
+#s-down{grid-column:2;grid-row:3}
 .pad button{
-  flex:1;font-size:19px;line-height:1;padding:14px 4px;
+  font-size:22px;line-height:1;padding:0;
   background:var(--paper);color:var(--wine);
   border:1px solid var(--rule);border-radius:3px;cursor:pointer;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
