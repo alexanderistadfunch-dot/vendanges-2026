@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif;background:#F7F3F1}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>Blåtur Paris</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: shared poster hero, then two switchable views — a three-column glance card and a full mono-rail agenda. Festival-poster typography, wine palette. */
+:root{
+  --paper:#F7F3F1;
+  --card:#FFFFFF;
+  --ink:#1E1418;
+  --ink-soft:#6E5C62;
+  --wine:#7A1E2B;
+  --wine-tint:#F1DFE0;
+  --vine:#3B5340;
+  --vine-tint:#E2EADF;
+  --rule:#E3D8D4;
+  --font-display:"Bodoni Moda",Georgia,"Times New Roman",serif;
+  --font-body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#151012;
+    --card:#1E1719;
+    --ink:#F1EAE8;
+    --ink-soft:#AC9BA0;
+    --wine:#DE7183;
+    --wine-tint:#3C2027;
+    --vine:#95B89B;
+    --vine-tint:#232E26;
+    --rule:#302629;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#151012;
+  --card:#1E1719;
+  --ink:#F1EAE8;
+  --ink-soft:#AC9BA0;
+  --wine:#DE7183;
+  --wine-tint:#3C2027;
+  --vine:#95B89B;
+  --vine-tint:#232E26;
+  --rule:#302629;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding-inline:20px}
+a{color:var(--wine)}
+
+/* ---- sticky view switcher ---- */
+.viewbar{
+  position:sticky;
+  top:env(safe-area-inset-top, 0px);
+  z-index:20;
+  background:color-mix(in srgb, var(--paper) 93%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.viewbar .wrap{display:flex;gap:6px;padding-block:9px}
+.viewbar button{
+  flex:1;
+  min-width:0;
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  background:none;
+  border:1px solid transparent;
+  border-radius:3px;
+  padding:8px 6px;
+  cursor:pointer;
+}
+.viewbar button[aria-selected="true"]{
+  color:var(--wine);
+  background:var(--wine-tint);
+  border-color:var(--wine-tint);
+}
+.viewbar button:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+
+/* ---- hero ---- */
+header.hero{padding-block:38px 28px}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--wine);
+  margin:0 0 18px;
+}
+h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(3.6rem,18vw,5.8rem);
+  line-height:.86;
+  letter-spacing:-.025em;
+  margin:0;
+}
+h1 .pre{
+  display:block;
+  font-size:.34em;
+  font-weight:500;
+  font-style:italic;
+  letter-spacing:.005em;
+  line-height:1.1;
+  margin-bottom:.14em;
+}
+.fest{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:clamp(1.1rem,4.4vw,1.4rem);
+  line-height:1.25;
+  color:var(--wine);
+  margin:16px 0 0;
+}
+.fest span{
+  display:block;
+  font-family:var(--font-mono);
+  font-style:normal;
+  font-size:11.5px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-top:7px;
+}
+.lede{margin:20px 0 0;max-width:50ch;color:var(--ink-soft)}
+.lede strong{color:var(--ink);font-weight:600}
+.lede .site{
+  display:inline-block;
+  margin-top:8px;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+/* ================= KORT VIEW ================= */
+.glance{padding-block:6px 40px}
+.gcols{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:30px 26px;
+}
+.gday{min-width:0}
+.gday h2{
+  font-family:var(--font-display);
+  font-size:1.5rem;
+  font-weight:700;
+  line-height:1;
+  margin:0 0 2px;
+}
+.gday .gdate{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  padding-bottom:9px;
+  border-bottom:1px solid var(--rule);
+  margin-bottom:11px;
+}
+.gday ul{margin:0;padding:0;list-style:none}
+.gday li{
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr);
+  gap:10px;
+  padding-block:5px;
+  font-size:15px;
+  line-height:1.4;
+}
+.gday li time{
+  font-family:var(--font-mono);
+  font-size:13.5px;
+  font-variant-numeric:tabular-nums;
+  color:var(--wine);
+  padding-top:1px;
+}
+.gday li .soft,.gday li time.soft{color:var(--ink-soft)}
+.gday li .q{color:var(--wine);font-weight:600}
+
+.anchor{
+  margin-top:34px;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  background:var(--card);
+  padding:16px 18px;
+}
+.anchor .lab{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--wine);
+  margin:0 0 10px;
+}
+.anchor ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.anchor li{
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  gap:10px;
+  font-size:15px;
+  line-height:1.4;
+}
+.anchor li b{
+  font-family:var(--font-mono);
+  font-size:13px;
+  font-weight:500;
+  font-variant-numeric:tabular-nums;
+  color:var(--wine);
+}
+.anchor .after{
+  margin:13px 0 0;
+  padding-top:13px;
+  border-top:1px solid var(--rule);
+  font-size:14.5px;
+  line-height:1.5;
+  color:var(--ink-soft);
+}
+.anchor .after b{color:var(--ink);font-weight:600}
+
+/* ================= PROGRAM VIEW ================= */
+.daynav{display:flex;gap:6px;padding-block:4px 2px}
+.daynav a{
+  flex:1;
+  text-align:center;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  text-decoration:none;
+  padding:7px 4px;
+  border:1px solid var(--rule);
+  border-radius:3px;
+}
+.daynav a:hover,.daynav a:focus-visible{color:var(--wine);border-color:var(--wine)}
+
+.facts{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;
+  background:var(--rule);
+  border:1px solid var(--rule);
+  border-radius:4px;
+  margin-block:24px;
+  overflow:hidden;
+}
+.fact{background:var(--card);padding:14px 16px;min-width:0}
+.fact dt{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:5px;
+}
+.fact dd{margin:0;font-size:14.5px;line-height:1.4}
+.fact dd b{font-weight:600}
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 14px;
+  align-items:center;
+  font-size:13px;
+  color:var(--ink-soft);
+  padding-bottom:26px;
+}
+.chip{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  padding:2.5px 7px;
+  border-radius:2px;
+  white-space:nowrap;
+  vertical-align:2px;
+}
+.chip.booked{background:var(--wine-tint);color:var(--wine)}
+.chip.free{background:var(--vine-tint);color:var(--vine)}
+.chip.secret{border:1px dashed var(--wine);color:var(--wine);background:none}
+
+section.day{padding-block:32px 10px;border-top:1px solid var(--rule)}
+.dayhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.dayhead h2{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:2.1rem;
+  line-height:1;
+  margin:0;
+}
+.dayhead .date{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.dayhead .tag{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:1rem;
+  color:var(--wine);
+}
+
+.row{
+  display:grid;
+  grid-template-columns:62px minmax(0,1fr);
+  gap:0 14px;
+  padding-block:14px;
+  border-top:1px solid var(--rule);
+}
+.row:first-of-type{border-top:none;padding-top:0}
+.row .t{
+  font-family:var(--font-mono);
+  font-size:14px;
+  font-weight:500;
+  font-variant-numeric:tabular-nums;
+  color:var(--wine);
+  padding-top:1px;
+}
+.row .t.dim{color:var(--ink-soft);font-weight:400}
+.row .c{min-width:0}
+.row h3{font-size:16.5px;font-weight:600;margin:0 0 3px;line-height:1.3}
+.row h3 .chip{margin-left:6px}
+.row p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.45}
+.row p + p{margin-top:4px}
+.row p b{color:var(--ink);font-weight:500}
+.row .span{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.04em;
+  color:var(--ink-soft);
+  display:block;
+  margin-bottom:3px;
+}
+.surprise{
+  border:1px dashed var(--wine);
+  border-radius:4px;
+  padding:13px 15px;
+  background:var(--wine-tint);
+}
+.surprise h3{margin-bottom:4px}
+.surprise h3:only-child{margin-bottom:0}
+.surprise p{color:var(--wine)}
+
+.notes{border-top:1px solid var(--rule);padding-block:32px 40px;margin-top:22px}
+.notes h2{font-family:var(--font-display);font-size:1.6rem;font-weight:700;margin:0 0 18px}
+.notes ul{margin:0;padding-left:0;list-style:none;display:grid;gap:12px}
+.notes li{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:11px;
+  font-size:14.5px;
+  line-height:1.45;
+  color:var(--ink-soft);
+}
+.notes li b{color:var(--ink);font-weight:600}
+.notes li::before{
+  content:"";
+  width:6px;height:6px;border-radius:50%;
+  background:var(--wine);margin-top:8px;
+}
+footer{
+  border-top:1px solid var(--rule);
+  padding-block:20px 40px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  line-height:1.7;
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<nav class="viewbar">
+  <div class="wrap" role="tablist" aria-label="Visning">
+    <button id="tab-kort" role="tab" aria-selected="true" aria-controls="view-kort">Kort</button>
+    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Hele programmet</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Blåtur · 9.–11. oktober 2026</p>
+    <h1><span class="pre">Vinfestival i</span>Paris</h1>
+    <p class="fest">Fête des Vendanges de Montmartre
+      <span>Montmartres vinhøstfest · 93. utgave</span>
+    </p>
+    <p class="lede"><strong>Montmartre</strong> er bydelen rundt Sacré-Cœur, og den har sin egen vingård midt mellom husene — <strong>Clos Montmartre</strong>. Hver oktober feirer bydelen innhøstingen: parade gjennom gatene, matmarked og vinprodusenter fra hele Frankrike. Festivalen går over fem dager, 7.–11. oktober.
+      <a class="site" href="https://fetedesvendangesdemontmartre.com/" target="_blank" rel="noopener">Festivalens nettside →</a>
+    </p>
+  </header>
+</div>
+
+<!-- ============ KORT ============ -->
+<div id="view-kort" role="tabpanel" aria-labelledby="tab-kort">
+  <div class="wrap glance">
+    <div class="gcols">
+
+      <div class="gday">
+        <h2>Fredag</h2>
+        <span class="gdate">9. oktober</span>
+        <ul>
+          <li><time>08:35</time><span>Fly fra Oslo</span></li>
+          <li><time>11:00</time><span>Landing Paris</span></li>
+          <li><time class="soft">13:00</time><span class="soft">Lunsj</span></li>
+          <li><time>15:00</time><span>Innsjekk</span></li>
+          <li><time>18:00</time><span>Aperitiff</span></li>
+          <li><time>20:00</time><span>Middag</span></li>
+          <li><time>21:45</time><span class="q">?</span></li>
+          <li><time class="soft">00:00</time><span class="soft">Se hva kvelden bringer</span></li>
+        </ul>
+      </div>
+
+      <div class="gday">
+        <h2>Lørdag</h2>
+        <span class="gdate">10. oktober · festivaldagen</span>
+        <ul>
+          <li><time class="soft">09:30</time><span class="soft">Frokost</span></li>
+          <li><time>11:15</time><span>Vi drar til Montmartre</span></li>
+          <li><time>11:45</time><span>Parade</span></li>
+          <li><time>13:30</time><span>Matmarked</span></li>
+          <li><time>14:30</time><span>Lunsj</span></li>
+          <li><time class="soft">15:30</time><span class="soft">Fritt</span></li>
+          <li><time>19:45</time><span>Taxi, samlet</span></li>
+          <li><time>20:15</time><span>Middag</span></li>
+          <li><time class="soft">22:30</time><span class="soft">Vinbar</span></li>
+        </ul>
+      </div>
+
+      <div class="gday">
+        <h2>Søndag</h2>
+        <span class="gdate">11. oktober</span>
+        <ul>
+          <li><time>10:00</time><span>Utsjekk</span></li>
+          <li><time class="soft">11:00</time><span class="soft">Severdigheter</span></li>
+          <li><time class="soft">14:45</time><span class="soft">Lunsj</span></li>
+          <li><time class="soft">16:30</time><span class="soft">Festivalavslutning</span></li>
+          <li><time>18:00</time><span>Møt ved leiligheten</span></li>
+          <li><time>18:15</time><span>Taxi til flyplassen</span></li>
+          <li><time>21:35</time><span>Fly hjem</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="anchor">
+      <p class="lab">Tidene du må møte</p>
+      <ul>
+        <li><b>Fre 18:00</b><span>Aperitiff — vi møtes</span></li>
+        <li><b>Lør 19:45</b><span>Taxi fra leiligheten</span></li>
+        <li><b>Søn 18:15</b><span>Taxi til flyplassen, fly 21:35</span></li>
+      </ul>
+      <p class="after"><b>Bo:</b> 9. arrondissement, adresse i gruppechatten · <b>Vær:</b> 15–17° dag, 9–10° kveld · <b>Klær:</b> smart casual hele helga</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HELE PROGRAMMET ============ -->
+<div id="view-program" role="tabpanel" aria-labelledby="tab-program" hidden>
+<div class="wrap">
+
+  <nav class="daynav">
+    <a href="#fredag">Fredag</a>
+    <a href="#lordag">Lørdag</a>
+    <a href="#sondag">Søndag</a>
+  </nav>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Base</dt>
+      <dd><b>9. arrondissement</b><br>Adresse i gruppechatten.</dd>
+    </div>
+    <div class="fact">
+      <dt>Hjem</dt>
+      <dd>Søndag <b>21:35</b> fra CDG</dd>
+    </div>
+    <div class="fact">
+      <dt>Været</dt>
+      <dd>15–17° dag, 9–10° kveld.<br>Tørt lørdag, litt regn fredag.</dd>
+    </div>
+    <div class="fact">
+      <dt>Felles utlegg</dt>
+      <dd>Alt på <b>Vippsgruppe</b>, inkludert taxier.</dd>
+    </div>
+  </dl>
+
+  <div class="legend">
+    <span><span class="chip booked">Booket</span> fast tid</span>
+    <span><span class="chip free">Fritt</span> du bestemmer</span>
+    <span><span class="chip secret">?</span> du får se</span>
+  </div>
+
+  <section class="day" id="fredag">
+    <div class="dayhead">
+      <h2>Fredag</h2>
+      <span class="date">9. oktober</span>
+    </div>
+
+    <div class="row">
+      <div class="t">08:35</div>
+      <div class="c">
+        <h3>Avgang Oslo</h3>
+        <p>Oppmøte på OSL <b>senest 07:00</b>.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">11:00</div>
+      <div class="c">
+        <h3>Landing Charles de Gaulle</h3>
+        <p>Taxi — to biler. 45–60 min.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">13:00</div>
+      <div class="c">
+        <h3>Lunsj <span class="chip free">Fritt</span></h3>
+        <p>Drop-in i nabolaget, ingen reservasjon.</p>
+        <p>Forslag: <b>La cantine de Sam</b> (vegetar), <b>Green Farmer's</b> (vegansk, burgere), <b>Le Trudaine</b> (brasserie med stor terrasse).</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">15:00</div>
+      <div class="c">
+        <h3>Innsjekk</h3>
+        <p>Nøkkel først kl. 15, så bagasjen er med oss fra vi lander.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">15:30</div>
+      <div class="c">
+        <span class="span">15:30 – 18:00</span>
+        <h3>Fri disposisjon <span class="chip free">Fritt</span></h3>
+        <p><b>Forslag:</b> åpne flaske vin og catch-up i leiligheten · handle i Pigalle · en forsmak på matmarkedet, 15 min unna og åpent til 23:00.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">18:00</div>
+      <div class="c">
+        <h3>Aperitiff <span class="chip booked">Booket</span></h3>
+        <p>Vinbar i Pigalle, 5 min gange.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">20:00</div>
+      <div class="c">
+        <h3>Middag <span class="chip booked">Booket</span></h3>
+        <p>Michelin-bistro i nabolaget, <b>Bib Gourmand</b>. Fransk klassisk.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">21:45</div>
+      <div class="c surprise">
+        <h3>? <span class="chip secret">Overraskelse</span></h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">00:00</div>
+      <div class="c">
+        <h3>Se hva kvelden bringer <span class="chip free">Fritt</span></h3>
+        <p><b>Pigalle er utelivsstrøket</b> — bar etter bar langs rue Frochot og rue Victor Massé, 5 min gange fra leiligheten.</p>
+        <p>Åpent sent: <b>Les Blancs Becs</b> (26 rue de Douai) til 02:00 · <b>Ovanac</b> (3 rue Pierre Fontaine) til 01:30 · <b>Glass</b> (7 rue Frochot) til 05:00.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="day" id="lordag">
+    <div class="dayhead">
+      <h2>Lørdag</h2>
+      <span class="date">10. oktober</span>
+      <span class="tag">festivaldagen</span>
+    </div>
+
+    <div class="row">
+      <div class="t dim">09:30</div>
+      <div class="c">
+        <h3>Frokost <span class="chip free">Fritt</span></h3>
+        <p>Ingen møtetid. Alt tar drop-in og ligger i gangavstand: <b>Le Pigalle</b> (åpner 07:00), <b>Brasserie place Saint-Georges</b>, <b>Kozy</b>, <b>Café Pigalle</b>, <b>Blondie</b>, <b>Açai and You</b>.</p>
+        <p>Lunsj blir ikke før 14:30.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">11:15</div>
+      <div class="c">
+        <h3>Vi drar til Montmartre</h3>
+        <p>Metro til Abbesses eller Lamarck–Caulaincourt, eller taxi.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">11:45</div>
+      <div class="c">
+        <span class="span">11:45 – 13:30</span>
+        <h3>Le Grand Défilé</h3>
+        <p>Festivalens store parade, med start fra vingården Clos Montmartre.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">13:30</div>
+      <div class="c">
+        <h3>Le Parcours du Goût</h3>
+        <p>Matmarkedet rundt Sacré-Cœur. Boder med mat og vin, åpent til 23:00.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">14:30</div>
+      <div class="c">
+        <h3>Lunsj i matmarkedet</h3>
+        <p>Produsenter og vinbønder fra hele Frankrike — fra Chablis til thaimat. Du plukker selv.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">15:30</div>
+      <div class="c">
+        <span class="span">15:30 – 19:30</span>
+        <h3>Fri disposisjon <span class="chip free">Fritt</span></h3>
+        <p>Ingen møtetid — du kommer tilbake til leiligheten når du vil.</p>
+        <p><b>Forslag:</b> vin og prat i leiligheten · Louvre, kjøp billett selv · omvisning i operaen Palais Garnier · loppemarkedet Puces de Saint-Ouen, rett nord for Montmartre · Sacré-Cœur og utsikten over byen · shopping i Le Marais · kaffe og folkeliv · seniorene kan sove.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">19:45</div>
+      <div class="c">
+        <h3>Taxi fra leiligheten</h3>
+        <p>Vi drar samlet til Belleville, ca. 5 km.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">20:15</div>
+      <div class="c">
+        <h3>Middag i Belleville <span class="chip booked">Booket</span></h3>
+        <p>Småretter til deling og naturvin. Kjøkkenet er åpent til 23:30.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">22:30</div>
+      <div class="c">
+        <h3>Vinbar <span class="chip free">Fritt</span></h3>
+        <p>Middagsstedet er selv vinbar og har åpent til 23:30, så vi kan bli sittende.</p>
+        <p><b>Ellers:</b> en bar i Belleville · <b>Ovanac</b> (3 rue Pierre Fontaine) hjemme i nabolaget, åpent til 01:30 · <b>Les Blancs Becs</b> (26 rue de Douai) til 02:00.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="day" id="sondag">
+    <div class="dayhead">
+      <h2>Søndag</h2>
+      <span class="date">11. oktober</span>
+    </div>
+
+    <div class="row">
+      <div class="t">10:00</div>
+      <div class="c">
+        <h3>Utsjekk</h3>
+        <p>Alt pakket og ut av rommene. Bagasjen settes fra seg.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">10:00</div>
+      <div class="c">
+        <h3>Frokost <span class="chip free">Fritt</span></h3>
+        <p><b>Kozy</b>, <b>Café Pigalle</b>, <b>Blondie</b> og <b>Açai and You</b> er åpne søndag.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">11:00</div>
+      <div class="c">
+        <span class="span">11:00 – 14:30</span>
+        <h3>Severdigheter <span class="chip free">For de som ønsker</span></h3>
+        <p><b>Forslag:</b> Louvre · Eiffeltårnet · Musée d'Orsay · Notre-Dame · Arc de Triomphe · en rolig formiddag på kafé.</p>
+        <p>Louvre krever billett kjøpt på forhånd, og slipper <b>ikke inn bagasje</b>.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">14:45</div>
+      <div class="c">
+        <h3>Lunsj <span class="chip free">Fritt</span></h3>
+        <p>Der du er, eller på vei nordover igjen.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t dim">16:30</div>
+      <div class="c">
+        <h3>Le Bal de clôture <span class="chip free">For de som ønsker</span></h3>
+        <p>Festivalens avslutning: DJ-sett i Square Louise Michel, rett nedenfor Sacré-Cœur. Her kan gjengen dele seg.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">18:00</div>
+      <div class="c">
+        <h3>Alle møtes ved leiligheten</h3>
+        <p>Hent bagasje.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">18:15</div>
+      <div class="c">
+        <h3>Taxi til CDG</h3>
+        <p>To biler. På flyplassen ca. 19:30.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="t">21:35</div>
+      <div class="c">
+        <h3>Avgang CDG</h3>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>Godt å vite</h2>
+    <ul>
+      <li><span><b>Tre tider du må møte:</b> aperitiff fredag 18:00, taxi lørdag 19:45, taxi til flyplassen søndag 18:15.</span></li>
+      <li><span><b>Vi går mye.</b> Montmartre er bakker og brostein, og paraden er to timer stående.</span></li>
+      <li><span><b>Kleskode:</b> smart casual hele helga. Begge middagene er bistro, ikke hvit duk.</span></li>
+      <li><span><b>Allergier og hensyn</b> er meldt inn på alle stedene vi har booket.</span></li>
+      <li><span><b>Felles utlegg</b> går på Vippsgruppa, inkludert taxier.</span></li>
+    </ul>
+  </section>
+</div>
+</div>
+
+<div class="wrap">
+  <footer>Montmartres vinhøstfest — Fête des Vendanges de Montmartre<br>9.–11. oktober 2026</footer>
+</div>
+
+<script>
+(function(){
+  var tabs = [
+    {btn: document.getElementById('tab-kort'), panel: document.getElementById('view-kort')},
+    {btn: document.getElementById('tab-program'), panel: document.getElementById('view-program')}
+  ];
+  function select(i){
+    tabs.forEach(function(t, j){
+      var on = i === j;
+      t.btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.panel.hidden = !on;
+    });
+  }
+  tabs.forEach(function(t, i){
+    t.btn.addEventListener('click', function(){ select(i); });
+  });
+  if ((location.hash || '').toLowerCase() === '#program') select(1);
+
+  document.querySelectorAll('.daynav a').forEach(function(a){
+    a.addEventListener('click', function(){ select(1); });
+  });
+})();
+</script>
+
+</body>
+</html>
