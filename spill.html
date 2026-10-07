@@ -177,7 +177,7 @@ canvas{
 }
 .result .sub{margin:6px 0 0;font-size:14.5px;color:var(--wine)}
 .result .copied{margin:10px 0 0;font-size:13.5px;color:var(--wine)}
-.result input[type=text]{margin-top:10px;font-size:15px}
+.result .actions:has(> [hidden]:only-child){display:none}
 
 .top{margin-top:26px}
 .tophead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -210,8 +210,8 @@ canvas{
 <body>
 <nav class="viewbar" aria-label="Sider">
   <div class="bar">
-    <a href="./">Kort</a>
-    <a href="./#program">Detaljert</a>
+    <a href="./?v=29856748">Kort</a>
+    <a href="./?v=29856748#program">Detaljert</a>
     <a href="spill.html" aria-current="page">Spill</a>
   </div>
 </nav>
@@ -266,11 +266,7 @@ canvas{
       <p class="copied" id="k-status" aria-live="polite" hidden></p>
       <div class="actions">
         <button class="btn" id="k-send" hidden>Send til topplista</button>
-        <button class="btn" id="k-share">Del scoren</button>
-        <button class="btn ghost" id="k-copy">Kopier</button>
       </div>
-      <p class="copied" id="k-copied" hidden></p>
-      <input type="text" id="k-fallback" readonly hidden aria-label="Tekst du kan kopiere">
     </div>
   </section>
 
@@ -305,11 +301,7 @@ canvas{
       <p class="copied" id="s-status" aria-live="polite" hidden></p>
       <div class="actions">
         <button class="btn" id="s-send" hidden>Send til topplista</button>
-        <button class="btn" id="s-share">Del scoren</button>
-        <button class="btn ghost" id="s-copy">Kopier</button>
       </div>
-      <p class="copied" id="s-copied" hidden></p>
-      <input type="text" id="s-fallback" readonly hidden aria-label="Tekst du kan kopiere">
     </div>
   </section>
 
@@ -457,43 +449,10 @@ canvas{
     $('s-best').textContent = s === null ? '—' : s;
   }
 
-  /* ---------- sharing ---------- */
-  var LABEL = { espen: '🍺 Stopp Drita-Espen', snake: '🐍 Slangen Jørgen' };
-  function shareText(game, score) {
-    var n = nameEl.value.trim();
-    return LABEL[game] + ': ' + score + ' poeng' + (n ? ' — ' + n : '');
-  }
-  function wireShare(prefix, game, getScore) {
-    var copied = $(prefix + '-copied'), fallback = $(prefix + '-fallback');
-    function showFallback(text) {
-      fallback.value = text; fallback.hidden = false;
-      fallback.focus(); fallback.select();
-      copied.textContent = 'Marker teksten og kopier den.'; copied.hidden = false;
-    }
-    function copy() {
-      var text = shareText(game, getScore());
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () {
-          copied.textContent = 'Kopiert: ' + text; copied.hidden = false;
-        }, function () { showFallback(text); });
-      } else { showFallback(text); }
-    }
-    $(prefix + '-copy').addEventListener('click', copy);
-    $(prefix + '-share').addEventListener('click', function () {
-      var text = shareText(game, getScore());
-      if (navigator.share) {
-        navigator.share({ text: text }).catch(function (e) {
-          if (!e || e.name !== 'AbortError') copy();
-        });
-      } else { copy(); }
-    });
-  }
   function showResult(prefix, game, score, extra) {
     var record = Store.submit(game, score);
     $(prefix + '-big').textContent = score;
     $(prefix + '-sub').textContent = (extra || 'poeng.') + (record ? ' Ny personlig rekord.' : '');
-    $(prefix + '-copied').hidden = true;
-    $(prefix + '-fallback').hidden = true;
     $(prefix + '-result').hidden = false;
     showBests();
     submit(prefix, game, score);
@@ -602,7 +561,6 @@ canvas{
     if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); kTap(); }
   });
   kStart.addEventListener('click', kNewGame);
-  wireShare('k', 'espen', kTotal);
   wireSend('k', 'espen', kTotal);
 
   /* ================= SLANGEN JØRGEN ================= */
@@ -718,7 +676,6 @@ canvas{
     $(b[0]).addEventListener('pointerdown', function (e) { e.preventDefault(); sTurn(b[1], b[2]); });
   });
   sStart.addEventListener('click', sNew);
-  wireShare('s', 'snake', function () { return S.score; });
   wireSend('s', 'snake', function () { return S.score; });
 
   var KEYS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1], a: [-1, 0], d: [1, 0], w: [0, -1], s: [0, 1] };
