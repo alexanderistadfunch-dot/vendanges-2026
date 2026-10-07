@@ -164,6 +164,31 @@ canvas{
 .result .copied{margin:10px 0 0;font-size:13.5px;color:var(--wine)}
 .result input[type=text]{margin-top:10px;font-size:15px}
 
+.top{margin-top:26px}
+.tophead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.tophead h2{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:500;color:var(--wine);margin:0;
+}
+.btn.small{padding:7px 12px;font-size:11px}
+.top ol{
+  margin:0;padding:0;list-style:none;display:grid;gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden;
+}
+.top li{
+  display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:baseline;
+  background:var(--card);padding:10px 14px;font-size:15.5px;
+}
+.top li .rank{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.top li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top li .sc{font-family:var(--font-mono);font-size:14.5px;font-weight:500;color:var(--wine);font-variant-numeric:tabular-nums}
+.top li:first-child .nm{font-weight:600}
+.top li.me{background:var(--wine-tint)}
+.top .tmsg{
+  margin:0;border:1px solid var(--rule);border-radius:4px;background:var(--card);
+  padding:13px 14px;font-size:14.5px;color:var(--ink-soft);
+}
+
 .foot{margin:22px 0 0;font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
 </style>
 </head>
@@ -172,10 +197,10 @@ canvas{
 
   <a class="back" href="./">← Programmet</a>
   <h1>Leken</h1>
-  <p class="lede">To spill. Spill så mange ganger du vil, og del scoren i gruppechatten.</p>
+  <p class="lede">To spill, én toppliste per spill. Skriv navnet ditt, så sendes scoren inn når runden er ferdig.</p>
 
   <label class="field" for="name">Navnet ditt</label>
-  <input id="name" type="text" maxlength="18" autocomplete="off" placeholder="Står på scoren du deler">
+  <input id="name" type="text" maxlength="18" autocomplete="off" placeholder="Slik det skal stå på topplista">
 
   <div class="pick" role="group" aria-label="Velg spill">
     <button id="pick-kork" aria-pressed="true">Stopp korken</button>
@@ -213,7 +238,9 @@ canvas{
     <div class="result" id="k-result" hidden>
       <p class="big" id="k-big"></p>
       <p class="sub" id="k-sub"></p>
+      <p class="copied" id="k-status" aria-live="polite" hidden></p>
       <div class="actions">
+        <button class="btn" id="k-send" hidden>Send til topplista</button>
         <button class="btn" id="k-share">Del scoren</button>
         <button class="btn ghost" id="k-copy">Kopier</button>
       </div>
@@ -248,7 +275,9 @@ canvas{
     <div class="result" id="s-result" hidden>
       <p class="big" id="s-big"></p>
       <p class="sub" id="s-sub"></p>
+      <p class="copied" id="s-status" aria-live="polite" hidden></p>
       <div class="actions">
+        <button class="btn" id="s-send" hidden>Send til topplista</button>
         <button class="btn" id="s-share">Del scoren</button>
         <button class="btn ghost" id="s-copy">Kopier</button>
       </div>
@@ -257,7 +286,15 @@ canvas{
     </div>
   </section>
 
-  <p class="foot">«Din beste» lagres bare på denne telefonen.</p>
+  <section class="top" aria-labelledby="t-title">
+    <div class="tophead">
+      <h2 id="t-title">Topplista · Stopp korken</h2>
+      <button class="btn ghost small" id="t-refresh">Oppdater</button>
+    </div>
+    <div id="t-body"><p class="tmsg">Henter …</p></div>
+  </section>
+
+  <p class="foot">Topplista er felles for alle og viser den beste scoren til hver. «Din beste» lagres på denne telefonen.</p>
 </div>
 
 <script>
@@ -284,6 +321,108 @@ canvas{
   var nameEl = $('name');
   nameEl.value = Store.get('bt_name') || '';
   nameEl.addEventListener('input', function () { Store.set('bt_name', nameEl.value.trim()); });
+
+  /* ---------- shared top list (Supabase). The key is the public, publishable one. ---------- */
+  var SB_URL = 'https://dhxwxdhkqictoyxbmbkq.supabase.co';
+  var SB_KEY = 'sb_publishable_oPS5JaFtcOyKbN4WIztQ9A_odhc88j-';
+  function call(url, opts) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 9000);
+    opts = opts || {};
+    if (ctl) opts.signal = ctl.signal;
+    return fetch(url, opts).then(function (r) {
+      clearTimeout(timer);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r;
+    }, function (e) { clearTimeout(timer); throw e; });
+  }
+  var Remote = {
+    top: function (game) {
+      var url = SB_URL + '/rest/v1/scores?select=name,score&game=eq.' + game + '&order=score.desc,created_at.asc&limit=300';
+      return call(url, { headers: { apikey: SB_KEY, Accept: 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.json(); });
+    },
+    add: function (game, name, score) {
+      return call(SB_URL + '/rest/v1/scores', {
+        method: 'POST',
+        headers: { apikey: SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ game: game, name: name, score: score })
+      });
+    }
+  };
+
+  var TITLE = { kork: 'Stopp korken', snake: 'Snake' };
+  var current = 'kork', boardSeq = 0;
+  function boardMessage(text) {
+    var body = $('t-body'); body.textContent = '';
+    var p = document.createElement('p'); p.className = 'tmsg'; p.textContent = text;
+    body.appendChild(p);
+  }
+  function renderBoard(rows) {
+    /* rows arrive best first; keep each person's best only */
+    var seen = {}, best = [];
+    for (var i = 0; i < rows.length && best.length < 10; i++) {
+      var nm = String(rows[i].name || '').trim(), key = nm.toLowerCase();
+      if (!nm || seen[key]) continue;
+      seen[key] = true; best.push({ name: nm, score: rows[i].score });
+    }
+    if (!best.length) { boardMessage('Ingen har spilt ennå.'); return; }
+    var me = nameEl.value.trim().toLowerCase();
+    var ol = document.createElement('ol');
+    best.forEach(function (e, i) {
+      var li = document.createElement('li');
+      if (me && e.name.toLowerCase() === me) li.className = 'me';
+      [['rank', (i + 1) + '.'], ['nm', e.name], ['sc', e.score]].forEach(function (c) {
+        var sp = document.createElement('span'); sp.className = c[0]; sp.textContent = c[1]; li.appendChild(sp);
+      });
+      ol.appendChild(li);
+    });
+    var body = $('t-body'); body.textContent = ''; body.appendChild(ol);
+  }
+  function loadBoard() {
+    var seq = ++boardSeq;
+    $('t-title').textContent = 'Topplista · ' + TITLE[current];
+    if (!$('t-body').querySelector('ol')) boardMessage('Henter …');
+    Remote.top(current).then(function (rows) {
+      if (seq === boardSeq) renderBoard(rows);
+    }, function () {
+      if (seq === boardSeq) boardMessage('Får ikke kontakt med topplista akkurat nå.');
+    });
+  }
+  $('t-refresh').addEventListener('click', loadBoard);
+
+  /* highest score this phone has already sent in, per game and name */
+  function sentKey(game, name) { return 'bt_sent_' + game + '_' + name.toLowerCase(); }
+  function submit(prefix, game, score) {
+    var status = $(prefix + '-status'), send = $(prefix + '-send');
+    send.hidden = true; status.hidden = true;
+    if (score <= 0) return;
+    status.hidden = false;
+    var n = nameEl.value.trim();
+    if (!n) {
+      status.textContent = 'Skriv navnet ditt øverst og trykk «Send til topplista».';
+      send.hidden = false; return;
+    }
+    var prev = parseInt(Store.get(sentKey(game, n)), 10);
+    if (!isNaN(prev) && score <= prev) {
+      status.textContent = 'Du står allerede på topplista med ' + prev + '.'; return;
+    }
+    status.textContent = 'Sender til topplista …';
+    Remote.add(game, n, score).then(function () {
+      Store.set(sentKey(game, n), String(score));
+      status.textContent = 'Sendt til topplista.';
+      if (current === game) loadBoard();
+    }, function () {
+      status.textContent = 'Fikk ikke kontakt med topplista. Prøv igjen.';
+      send.hidden = false;
+    });
+  }
+  function wireSend(prefix, game, getScore) {
+    $(prefix + '-send').addEventListener('click', function () {
+      if (!nameEl.value.trim()) { nameEl.focus(); return; }
+      submit(prefix, game, getScore());
+    });
+  }
 
   function showBests() {
     var k = Store.best('kork'), s = Store.best('snake');
@@ -330,6 +469,7 @@ canvas{
     $(prefix + '-fallback').hidden = true;
     $(prefix + '-result').hidden = false;
     showBests();
+    submit(prefix, game, score);
   }
 
   /* ================= STOPP KORKEN ================= */
@@ -399,6 +539,7 @@ canvas{
   });
   kStart.addEventListener('click', kNewGame);
   wireShare('k', 'kork', kTotal);
+  wireSend('k', 'kork', kTotal);
 
   /* ================= SNAKE ================= */
   var COLS = 17, ROWS = 17, CELL = 20;
@@ -492,6 +633,7 @@ canvas{
   });
   sStart.addEventListener('click', sNew);
   wireShare('s', 'snake', function () { return S.score; });
+  wireSend('s', 'snake', function () { return S.score; });
 
   var KEYS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1], a: [-1, 0], d: [1, 0], w: [0, -1], s: [0, 1] };
   window.addEventListener('keydown', function (e) {
@@ -523,14 +665,18 @@ canvas{
     kHalt(); sHalt();
     gameK.hidden = !k; gameS.hidden = k;
     if (!k) sIdle();
+    current = which;
+    $('t-body').textContent = '';
+    loadBoard();
   }
   pickK.addEventListener('click', function () { pick('kork'); });
   pickS.addEventListener('click', function () { pick('snake'); });
 
   window.addEventListener('resize', function () { if (!gameS.hidden) { sSize(); sDraw(); } });
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { clearTimeout(S.timer); }
-    else if (S.on) { clearTimeout(S.timer); S.timer = setTimeout(sTick, S.step); }
+    if (document.hidden) { clearTimeout(S.timer); return; }
+    if (S.on) { clearTimeout(S.timer); S.timer = setTimeout(sTick, S.step); }
+    else if (!K.on) loadBoard();                 /* back on the page between games: refresh the list */
   });
   if (window.matchMedia) {
     var mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -540,6 +686,7 @@ canvas{
 
   showBests();
   kPlace(0.5);
+  loadBoard();
 })();
 </script>
 </body>
