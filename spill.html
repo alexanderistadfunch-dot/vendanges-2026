@@ -106,31 +106,36 @@ input[type=text]:focus-visible{outline:2px solid var(--wine);outline-offset:1px}
 }
 .hud b{color:var(--wine);font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 
-/* ---- stopp korken ---- */
+/* ---- stopp drita-espen ---- */
 .track{
-  position:relative;height:168px;border-radius:4px;overflow:hidden;
+  position:relative;height:360px;border-radius:4px;overflow:hidden;
   background:var(--paper);border:1px solid var(--rule);
   touch-action:manipulation;cursor:pointer;
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
 }
 .zone-wide,.zone-bull{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%)}
-.zone-wide{width:26%;background:var(--vine-tint)}
-.zone-bull{width:4%;background:var(--wine-tint);border-inline:1px solid var(--wine)}
-.cork{
-  position:absolute;top:12px;bottom:12px;width:14px;left:0;
-  transform:translateX(-50%);border-radius:3px;background:var(--wine);
+.zone-wide{width:24%;background:var(--vine-tint)}
+.zone-bull{width:6%;background:var(--wine-tint);border-inline:1px solid var(--wine)}
+.mark{position:absolute;top:50%;transform:translateY(-50%);font-size:26px;line-height:1;pointer-events:none}
+.mark.l{left:6px}
+.mark.r{right:6px}
+.face{
+  position:absolute;left:0;top:0;width:68px;height:68px;border-radius:50%;
+  box-shadow:0 0 0 2px var(--wine);background:var(--wine-tint);
+  pointer-events:none;will-change:transform;
 }
 .flash{
   min-height:1.5em;margin:10px 0 0;text-align:center;
   font-family:var(--font-mono);font-size:14px;color:var(--wine);font-variant-numeric:tabular-nums;
 }
-.rounds{display:flex;gap:6px;margin-top:6px}
+.rounds{display:flex;gap:5px;margin-top:6px}
 .rounds span{
-  flex:1;text-align:center;font-family:var(--font-mono);font-size:12px;
-  font-variant-numeric:tabular-nums;
-  padding:7px 2px;border:1px solid var(--rule);border-radius:3px;color:var(--ink-soft);
+  flex:1;min-width:0;text-align:center;font-family:var(--font-mono);font-size:12px;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+  padding:7px 0;border:1px solid var(--rule);border-radius:3px;color:var(--ink-soft);
 }
 .rounds span.done{color:var(--wine);border-color:var(--wine-tint);background:var(--wine-tint)}
+.rules + .rules{margin-top:-8px}
 
 /* ---- snake ---- */
 .board{display:flex;justify-content:center}
@@ -219,25 +224,28 @@ canvas{
   <input id="name" type="text" maxlength="18" autocomplete="off" placeholder="Slik det skal stå på topplista">
 
   <div class="pick" role="group" aria-label="Velg spill">
-    <button id="pick-kork" aria-pressed="true">Stopp korken</button>
+    <button id="pick-kork" aria-pressed="true">Drita-Espen</button>
     <button id="pick-snake" aria-pressed="false">Snake</button>
   </div>
 
-  <!-- ============ STOPP KORKEN ============ -->
+  <!-- ============ STOPP DRITA-ESPEN ============ -->
   <section class="game" id="game-kork" aria-labelledby="h-kork">
-    <h2 id="h-kork">Stopp korken</h2>
-    <p class="rules">Korken går fram og tilbake. Tapp på stripen for å stoppe den nærmest mulig midten. Tre runder, fortere for hver. Maks 300.</p>
+    <h2 id="h-kork">Stopp Drita-Espen</h2>
+    <p class="rules">Hjelp! Espen er på vei til å bikke. Og vi veit hvordan han kan bli da! Stopp Espen fra å ta en øl til.</p>
+    <p class="rules">Tapp på skjermen når han er midt mellom ølene. Fem runder, fortere og villere for hver. Maks 500.</p>
 
     <div class="hud">
-      <span>Runde <b id="k-round">1</b>/3</span>
+      <span>Runde <b id="k-round">1</b>/5</span>
       <span>Sum <b id="k-total">0</b></span>
       <span>Din beste <b id="k-best">—</b></span>
     </div>
 
-    <div class="track" id="k-track" role="button" tabindex="0" aria-label="Stopp korken">
-      <div class="zone-wide"></div>
-      <div class="zone-bull"></div>
-      <div class="cork" id="k-cork"></div>
+    <div class="track" id="k-track" role="button" tabindex="0" aria-label="Stopp Espen">
+      <div class="zone-wide" id="k-wide"></div>
+      <div class="zone-bull" id="k-bull"></div>
+      <span class="mark l" aria-hidden="true">🍺</span>
+      <span class="mark r" aria-hidden="true">🍺</span>
+      <img class="face" id="k-cork" src="espen.webp" alt="Espen" width="68" height="68" draggable="false">
     </div>
     <p class="flash" id="k-flash" aria-live="polite"></p>
 
@@ -245,6 +253,8 @@ canvas{
       <span id="k-r1">1 · —</span>
       <span id="k-r2">2 · —</span>
       <span id="k-r3">3 · —</span>
+      <span id="k-r4">4 · —</span>
+      <span id="k-r5">5 · —</span>
     </div>
 
     <div class="actions">
@@ -304,7 +314,7 @@ canvas{
 
   <section class="top" aria-labelledby="t-title">
     <div class="tophead">
-      <h2 id="t-title">Topplista · Stopp korken</h2>
+      <h2 id="t-title">Topplista · Stopp Drita-Espen</h2>
       <button class="btn ghost small" id="t-refresh">Oppdater</button>
     </div>
     <div id="t-body"><p class="tmsg">Henter …</p></div>
@@ -367,8 +377,8 @@ canvas{
     }
   };
 
-  var TITLE = { kork: 'Stopp korken', snake: 'Snake' };
-  var current = 'kork', boardSeq = 0;
+  var TITLE = { espen: 'Stopp Drita-Espen', snake: 'Snake' };
+  var current = 'espen', boardSeq = 0;
   function boardMessage(text) {
     var body = $('t-body'); body.textContent = '';
     var p = document.createElement('p'); p.className = 'tmsg'; p.textContent = text;
@@ -441,13 +451,13 @@ canvas{
   }
 
   function showBests() {
-    var k = Store.best('kork'), s = Store.best('snake');
+    var k = Store.best('espen'), s = Store.best('snake');
     $('k-best').textContent = k === null ? '—' : k;
     $('s-best').textContent = s === null ? '—' : s;
   }
 
   /* ---------- sharing ---------- */
-  var LABEL = { kork: '🍾 Stopp korken', snake: '🐍 Snake' };
+  var LABEL = { espen: '🍺 Stopp Drita-Espen', snake: '🐍 Snake' };
   function shareText(game, score) {
     var n = nameEl.value.trim();
     return LABEL[game] + ': ' + score + ' poeng' + (n ? ' — ' + n : '');
@@ -480,7 +490,7 @@ canvas{
   function showResult(prefix, game, score, extra) {
     var record = Store.submit(game, score);
     $(prefix + '-big').textContent = score;
-    $(prefix + '-sub').textContent = extra || (record ? 'Ny personlig rekord.' : 'poeng');
+    $(prefix + '-sub').textContent = extra || (record ? 'poeng. Ny personlig rekord.' : 'poeng');
     $(prefix + '-copied').hidden = true;
     $(prefix + '-fallback').hidden = true;
     $(prefix + '-result').hidden = false;
@@ -488,64 +498,101 @@ canvas{
     submit(prefix, game, score);
   }
 
-  /* ================= STOPP KORKEN ================= */
-  var K = { on: false, round: 0, scores: [], pos: 0, dir: 1, v: 0, raf: 0, last: 0, wait: 0 };
-  var K_SWEEP = [1.7, 1.25, 0.9];           /* seconds per crossing, one per round */
-  var kTrack = $('k-track'), kCork = $('k-cork'), kFlash = $('k-flash'), kStart = $('k-start');
+  /* ================= STOPP DRITA-ESPEN ================= */
+  /* cross = seconds for one trip from beer to beer; each round has its own way of moving */
+  var ROUNDS = [
+    { name: 'Rolig start',  cross: 1.7 },
+    { name: 'Litt fortere', cross: 1.2 },
+    { name: 'Sjangler',     cross: 1.0 },
+    { name: 'Rykk og napp', cross: 0.95 },
+    { name: 'Full fyr',     cross: 0.62 }
+  ];
+  var FACE = 68, BULL = 0.06;                 /* BULL: share of the way from the middle that still counts as a hit */
+  var K = { on: false, round: 0, scores: [], p: 0.5, q: 0.5, tilt: 0, start: 0, dir: 1, flip: 0,
+            t0: 0, last: 0, raf: 0, wait: 0, tx: 0, ty: 0 };
+  var kTrack = $('k-track'), kFace = $('k-cork'), kFlash = $('k-flash'), kStart = $('k-start');
 
+  function tri(u) { u = ((u % 2) + 2) % 2; return u < 1 ? u : 2 - u; }     /* 0→1→0, there and back */
   function kTotal() { return K.scores.reduce(function (a, b) { return a + b; }, 0); }
-  function kPlace(p) { kCork.style.left = (p * 100) + '%'; }
+  function kLayout() {
+    K.tx = Math.max(0, kTrack.clientWidth - FACE);
+    K.ty = Math.max(0, kTrack.clientHeight - FACE);
+    /* draw the zones to scale with how far the face actually travels */
+    $('k-bull').style.width = (BULL * K.tx) + 'px';
+    $('k-wide').style.width = (0.26 * K.tx) + 'px';
+  }
+  function kPlace() {
+    kFace.style.transform = 'translate(' + (K.p * K.tx).toFixed(1) + 'px,' + (K.q * K.ty).toFixed(1) + 'px) rotate(' + K.tilt.toFixed(1) + 'deg)';
+  }
   function kHalt() {
     if (K.raf) { cancelAnimationFrame(K.raf); K.raf = 0; }
     clearTimeout(K.wait);
-    K.on = false; K.last = 0;
+    K.on = false;
   }
-  function kFrame(t) {
-    if (!K.last) K.last = t;
-    var dt = Math.min(60, t - K.last); K.last = t;
-    K.pos += K.dir * K.v * dt;
-    if (K.pos > 1) { K.pos = 2 - K.pos; K.dir = -1; }
-    else if (K.pos < 0) { K.pos = -K.pos; K.dir = 1; }
-    kPlace(K.pos);
+  function kMove(t, dt) {
+    var c = ROUNDS[K.round].cross, TAU = Math.PI * 2;
+    switch (K.round) {
+      case 0:                                   /* straight and steady */
+        K.p = tri(t / c + K.start); K.q = 0.5; K.tilt = 5 * Math.sin(t * 2.4); break;
+      case 1:                                   /* quicker, with a slow bob */
+        K.p = tri(t / c + K.start); K.q = 0.5 + 0.14 * Math.sin(TAU * t / 1.5); K.tilt = 8 * Math.sin(t * 3.2); break;
+      case 2:                                   /* staggering: slow at the beers, fastest through the middle */
+        K.p = 0.5 - 0.5 * Math.cos(Math.PI * (t / c + K.start));
+        K.q = 0.5 + 0.34 * Math.sin(TAU * t / 0.85); K.tilt = 18 * Math.sin(TAU * t / 0.85); break;
+      case 3:                                   /* lurching: surges forward, pulls back */
+        K.p = tri(t / c + K.start + 0.26 * Math.sin(TAU * t / 0.8));
+        K.q = 0.08 + 0.84 * tri(t / 0.6); K.tilt = 14 * Math.sin(TAU * t / 0.4); break;
+      default:                                  /* flat out: turns around without warning, spinning */
+        K.p += K.dir * dt / c;
+        if (K.p > 1) { K.p = 2 - K.p; K.dir = -1; } else if (K.p < 0) { K.p = -K.p; K.dir = 1; }
+        if (t > K.flip) { K.dir = -K.dir; K.flip = t + 0.45 + Math.random() * 0.75; }
+        K.q = 0.04 + 0.92 * tri(t / 0.47); K.tilt = (t * 300) % 360;
+    }
+  }
+  function kFrame(now) {
+    if (!K.t0) { K.t0 = now; K.last = now; }
+    var dt = Math.min(0.06, (now - K.last) / 1000); K.last = now;
+    kMove((now - K.t0) / 1000, dt);
+    kPlace();
     K.raf = requestAnimationFrame(kFrame);
   }
   function kBeginRound() {
-    K.v = 1 / (K_SWEEP[K.round] * 1000);
-    K.pos = Math.random() < 0.5 ? 0 : 1;
-    K.dir = K.pos === 0 ? 1 : -1;
-    K.last = 0; K.on = true;
+    kLayout();
+    K.start = Math.random() < 0.5 ? 0 : 1;      /* which beer he sets off from */
+    K.p = K.start; K.dir = K.start === 0 ? 1 : -1;
+    K.flip = 0.5 + Math.random() * 0.6;
+    K.t0 = 0; K.on = true;
     $('k-round').textContent = K.round + 1;
-    kFlash.textContent = '';
-    kPlace(K.pos);
+    kFlash.textContent = 'Runde ' + (K.round + 1) + ' · ' + ROUNDS[K.round].name;
     K.raf = requestAnimationFrame(kFrame);
   }
   function kNewGame() {
     kHalt();
     K.round = 0; K.scores = [];
     $('k-total').textContent = '0';
-    [1, 2, 3].forEach(function (i) { var el = $('k-r' + i); el.textContent = i + ' · —'; el.className = ''; });
+    ROUNDS.forEach(function (_, i) { var el = $('k-r' + (i + 1)); el.textContent = (i + 1) + ' · —'; el.className = ''; });
     $('k-result').hidden = true;
     kStart.textContent = 'Start på nytt';
     kBeginRound();
   }
   function kScore(pos) {
-    var off = Math.abs(pos - 0.5) / 0.5;      /* 0 in the middle, 1 at either end */
-    return off < 0.02 ? 100 : Math.max(0, Math.round(100 * (1 - off)));
+    var off = Math.abs(pos - 0.5) / 0.5;        /* 0 in the middle, 1 at either beer */
+    return off < BULL ? 100 : Math.max(0, Math.round(100 * (1 - off)));
   }
   function kTap() {
     if (!K.on) return;
     kHalt();
-    var sc = kScore(K.pos);
+    var sc = kScore(K.p);
     K.scores.push(sc);
     var box = $('k-r' + (K.round + 1));
     box.textContent = (K.round + 1) + ' · ' + sc; box.className = 'done';
     $('k-total').textContent = kTotal();
     kFlash.textContent = sc === 100 ? 'Blink! +100' : '+' + sc;
     K.round++;
-    if (K.round < 3) { K.wait = setTimeout(kBeginRound, 800); }
+    if (K.round < ROUNDS.length) { K.wait = setTimeout(kBeginRound, 900); }
     else {
       var total = kTotal();
-      showResult('k', 'kork', total, total === 300 ? 'Tre blink av tre.' : null);
+      showResult('k', 'espen', total, total === 500 ? 'Fem blink av fem.' : null);
       kStart.textContent = 'Spill igjen';
     }
   }
@@ -554,8 +601,8 @@ canvas{
     if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); kTap(); }
   });
   kStart.addEventListener('click', kNewGame);
-  wireShare('k', 'kork', kTotal);
-  wireSend('k', 'kork', kTotal);
+  wireShare('k', 'espen', kTotal);
+  wireSend('k', 'espen', kTotal);
 
   /* ================= SNAKE ================= */
   var COLS = 17, ROWS = 17, CELL = 20;
@@ -675,20 +722,22 @@ canvas{
   /* ================= switching and housekeeping ================= */
   var pickK = $('pick-kork'), pickS = $('pick-snake'), gameK = $('game-kork'), gameS = $('game-snake');
   function pick(which) {
-    var k = which === 'kork';
+    var k = which === 'espen';
     pickK.setAttribute('aria-pressed', k ? 'true' : 'false');
     pickS.setAttribute('aria-pressed', k ? 'false' : 'true');
     kHalt(); sHalt();
     gameK.hidden = !k; gameS.hidden = k;
-    if (!k) sIdle();
+    if (!k) sIdle(); else { kLayout(); kPlace(); }
     current = which;
     $('t-body').textContent = '';
     loadBoard();
   }
-  pickK.addEventListener('click', function () { pick('kork'); });
+  pickK.addEventListener('click', function () { pick('espen'); });
   pickS.addEventListener('click', function () { pick('snake'); });
 
-  window.addEventListener('resize', function () { if (!gameS.hidden) { sSize(); sDraw(); } });
+  window.addEventListener('resize', function () {
+    if (!gameS.hidden) { sSize(); sDraw(); } else { kLayout(); kPlace(); }
+  });
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) { clearTimeout(S.timer); return; }
     if (S.on) { clearTimeout(S.timer); S.timer = setTimeout(sTick, S.step); }
@@ -701,7 +750,7 @@ canvas{
   }
 
   showBests();
-  kPlace(0.5);
+  kLayout(); kPlace();
   loadBoard();
 })();
 </script>
