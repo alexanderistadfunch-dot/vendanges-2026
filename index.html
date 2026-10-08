@@ -408,9 +408,8 @@ footer{
 
 <nav class="viewbar">
   <div class="wrap" role="tablist" aria-label="Visning">
-    <button id="tab-kort" role="tab" aria-selected="true" aria-controls="view-kort">Kort</button>
-    <button id="tab-program" role="tab" aria-selected="false" aria-controls="view-program">Detaljert</button>
-    <a class="tablink" href="spill.html?v=29857313">Spill</a>
+    <button id="tab-program" role="tab" aria-selected="true" aria-controls="view-program">Program</button>
+    <a class="tablink" href="spill.html?v=29857319">Spill</a>
   </div>
 </nav>
 
@@ -427,72 +426,8 @@ footer{
   </header>
 </div>
 
-<!-- ============ KORT ============ -->
-<div id="view-kort" role="tabpanel" aria-labelledby="tab-kort">
-  <div class="wrap glance">
-    <div class="gcols">
-
-      <div class="gday">
-        <h2>Fredag</h2>
-        <span class="gdate">9. oktober</span>
-        <ul>
-          <li><time>08:35</time><span>Fly fra Oslo</span></li>
-          <li><time>11:00</time><span>Landing Paris</span></li>
-          <li><time>13:00</time><span>Lunsj</span></li>
-          <li><time>15:00</time><span>Innsjekk</span></li>
-          <li><time>18:00</time><span>Aperitiff</span></li>
-          <li><time>20:00</time><span>Middag</span></li>
-          <li><time>21:45</time><span class="q">?</span></li>
-          <li><time>00:00</time><span>Se hva kvelden bringer</span></li>
-        </ul>
-      </div>
-
-      <div class="gday">
-        <h2>Lørdag</h2>
-        <span class="gdate">10. oktober · festivaldagen</span>
-        <ul>
-          <li><time>09:30</time><span>Frokost</span></li>
-          <li><time>11:15</time><span>Vi drar til Montmartre</span></li>
-          <li><time>11:45</time><span>Parade</span></li>
-          <li><time>13:30</time><span>Matmarked</span></li>
-          <li><time>14:30</time><span>Lunsj</span></li>
-          <li><time>15:30</time><span>Fritt</span></li>
-          <li><time>19:45</time><span>Taxi, samlet</span></li>
-          <li><time>20:15</time><span>Middag</span></li>
-          <li><time>22:30</time><span>Vinbar</span></li>
-        </ul>
-      </div>
-
-      <div class="gday">
-        <h2>Søndag</h2>
-        <span class="gdate">11. oktober</span>
-        <ul>
-          <li><time>10:00</time><span>Utsjekk</span></li>
-          <li><time>11:00</time><span>Severdigheter</span></li>
-          <li><time>14:45</time><span>Lunsj</span></li>
-          <li><time>16:30</time><span>Festivalavslutning</span></li>
-          <li><time>18:00</time><span>Møt ved leiligheten</span></li>
-          <li><time>18:15</time><span>Taxi til flyplassen</span></li>
-          <li><time>21:35</time><span>Fly hjem</span></li>
-        </ul>
-      </div>
-
-    </div>
-
-    <div class="anchor">
-      <p class="lab">Tidene du må møte</p>
-      <ul>
-        <li><b>Fre 18:00</b><span>Aperitiff — vi møtes</span></li>
-        <li><b>Lør 19:45</b><span>Taxi fra leiligheten</span></li>
-        <li><b>Søn 18:15</b><span>Taxi til flyplassen, fly 21:35</span></li>
-      </ul>
-      <p class="after"><b>Bo:</b> 9. arrondissement, adresse i gruppechatten · <b>Vær:</b> 15–17° dag, 9–10° kveld · <b>Klær:</b> smart casual hele helga</p>
-    </div>
-  </div>
-</div>
-
 <!-- ============ HELE PROGRAMMET ============ -->
-<div id="view-program" role="tabpanel" aria-labelledby="tab-program" hidden>
+<div id="view-program" role="tabpanel" aria-labelledby="tab-program">
 <div class="wrap">
 
   <nav class="daynav">
@@ -528,8 +463,14 @@ footer{
 
   <section class="day" id="fredag">
     <div class="dayhead">
-      <h2>Fredag</h2>
-      <span class="date">9. oktober</span>
+      <div class="dh-left">
+        <h2>Fredag</h2>
+        <span class="date">9. oktober</span>
+      </div>
+      <button type="button" class="sw" id="tog-all" role="switch" aria-checked="false" aria-label="Åpne eller lukke alle detaljer">
+        <span class="sw-lbl" aria-hidden="true">Åpne/lukke</span>
+        <span class="sw-track" aria-hidden="true"><span class="sw-knob"></span></span>
+      </button>
     </div>
 
     <div class="row">
@@ -781,29 +722,72 @@ footer{
   <footer>Montmartres vinhøstfest — Fête des Vendanges de Montmartre<br>9.–11. oktober 2026</footer>
 </div>
 
-<script>
-(function(){
-  var tabs = [
-    {btn: document.getElementById('tab-kort'), panel: document.getElementById('view-kort')},
-    {btn: document.getElementById('tab-program'), panel: document.getElementById('view-program')}
-  ];
-  function select(i){
-    tabs.forEach(function(t, j){
-      var on = i === j;
-      t.btn.setAttribute('aria-selected', on ? 'true' : 'false');
-      t.panel.hidden = !on;
-    });
-  }
-  tabs.forEach(function(t, i){
-    t.btn.addEventListener('click', function(){ select(i); });
-  });
-  if ((location.hash || '').toLowerCase() === '#program') select(1);
 
-  document.querySelectorAll('.daynav a').forEach(function(a){
-    a.addEventListener('click', function(){ select(1); });
+
+<style>
+#fredag .dayhead{flex-wrap:nowrap;align-items:flex-start}
+.dh-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;flex:1;min-width:0}
+.sw{
+  display:flex;align-items:center;gap:7px;flex:none;margin-left:auto;margin-top:-4px;
+  background:none;border:0;padding:0;cursor:pointer;color:var(--ink-soft);
+  -webkit-tap-highlight-color:transparent;
+}
+.sw-lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.sw-track{position:relative;flex:none;width:58px;height:34px;border-radius:17px;background:var(--rule);transition:background .18s ease}
+.sw-knob{
+  position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink-soft);transition:transform .18s ease,background .18s ease;
+}
+.sw[aria-checked="true"] .sw-track{background:var(--wine-tint);box-shadow:inset 0 0 0 1.5px var(--wine)}
+.sw[aria-checked="true"] .sw-knob{transform:translateX(24px);background:var(--wine)}
+.sw[aria-checked="true"] .sw-lbl{color:var(--wine)}
+.sw:focus-visible{outline:2px solid var(--wine);outline-offset:3px;border-radius:19px}
+@media (prefers-reduced-motion:reduce){.sw-track,.sw-knob{transition:none}}
+.row h3 .tog{
+  display:flex;align-items:baseline;gap:8px;width:100%;
+  margin:0;padding:0;border:0;background:none;color:inherit;
+  font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.row h3 .tog:focus-visible{outline:2px solid var(--wine);outline-offset:3px;border-radius:2px}
+.row h3 .tog .lbl{min-width:0}
+.row h3 .tog .chev{
+  margin-left:auto;flex:none;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);
+  transition:transform .15s ease;
+}
+.row.closed h3 .tog .chev{transform:rotate(-90deg)}
+.row.closed .c > p{display:none}
+.row.closed h3{margin-bottom:0}
+@media (prefers-reduced-motion:reduce){.row h3 .tog .chev{transition:none}}
+</style>
+<script>
+(function () {
+  /* every item with details gets its heading turned into a button that shows or hides them */
+  var rows = [].slice.call(document.querySelectorAll('#view-program .row')).filter(function (r) {
+    return r.querySelector('.c > h3') && r.querySelector('.c > p');
   });
+  function setOpen(r, open) {
+    r.classList.toggle('closed', !open);
+    r.querySelector('.tog').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  var all = document.getElementById('tog-all');
+  function anyOpen() { return rows.some(function (r) { return !r.classList.contains('closed'); }); }
+  function sync() { all.setAttribute('aria-checked', anyOpen() ? 'true' : 'false'); }
+  rows.forEach(function (r, i) {
+    var h = r.querySelector('.c > h3');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tog';
+    var lbl = document.createElement('span'); lbl.className = 'lbl';
+    while (h.firstChild) lbl.appendChild(h.firstChild);
+    var chev = document.createElement('span'); chev.className = 'chev'; chev.setAttribute('aria-hidden', 'true'); chev.textContent = '▾';
+    b.appendChild(lbl); b.appendChild(chev); h.appendChild(b);
+    var ids = [];
+    [].forEach.call(r.querySelectorAll('.c > p'), function (p, j) { p.id = p.id || 'detalj-' + i + '-' + j; ids.push(p.id); });
+    b.setAttribute('aria-controls', ids.join(' '));
+    b.addEventListener('click', function () { setOpen(r, r.classList.contains('closed')); sync(); });
+    setOpen(r, false);                       /* everything starts closed: the overview first */
+  });
+  all.addEventListener('click', function () { var open = !anyOpen(); rows.forEach(function (r) { setOpen(r, open); }); sync(); });
+  sync();
 })();
 </script>
-
 </body>
 </html>
