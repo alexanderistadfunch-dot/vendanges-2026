@@ -463,14 +463,8 @@ footer{
 
   <section class="day" id="fredag">
     <div class="dayhead">
-      <div class="dh-left">
-        <h2>Fredag</h2>
-        <span class="date">9. oktober</span>
-      </div>
-      <button type="button" class="sw" id="tog-all" role="switch" aria-checked="false" aria-label="Åpne eller lukke alle detaljer">
-        <span class="sw-lbl" aria-hidden="true">Åpne/lukke</span>
-        <span class="sw-track" aria-hidden="true"><span class="sw-knob"></span></span>
-      </button>
+      <h2>Fredag</h2>
+      <span class="date">9. oktober</span>
     </div>
 
     <div class="row">
@@ -725,8 +719,6 @@ footer{
 
 
 <style>
-#fredag .dayhead{flex-wrap:nowrap;align-items:flex-start}
-.dh-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;flex:1;min-width:0}
 .sw{
   display:flex;align-items:center;gap:7px;flex:none;margin-left:auto;margin-top:-4px;
   background:none;border:0;padding:0;cursor:pointer;color:var(--ink-soft);
@@ -758,21 +750,30 @@ footer{
 .row.closed .c > p{display:none}
 .row.closed h3{margin-bottom:0}
 @media (prefers-reduced-motion:reduce){.row h3 .tog .chev{transition:none}}
+
+.dayhead{flex-wrap:nowrap!important;align-items:flex-start!important}
+.dayhead h2{flex:1;min-width:0}
+.daytog{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;
+  margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.daytog:focus-visible{outline:2px solid var(--wine);outline-offset:4px;border-radius:2px}
+.daytog .dchev{
+  align-self:center;font-family:var(--font-mono);font-size:15px;line-height:1;color:var(--ink-soft);
+  transition:transform .15s ease;
+}
+.daytog .date,.daytog .tag{font-weight:400}
+.day.shut .daytog .dchev{transform:rotate(-90deg)}
+.day.shut .daybody,.day.shut .sw{display:none}
+.day.shut .dayhead{margin-bottom:0}
+.daysum{display:none;margin:8px 0 0;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--ink-soft)}
+.day.shut .daysum{display:block}
+@media (prefers-reduced-motion:reduce){.daytog .dchev{transition:none}}
 </style>
 <script>
 (function () {
-  /* every item with details gets its heading turned into a button that shows or hides them */
-  var rows = [].slice.call(document.querySelectorAll('#view-program .row')).filter(function (r) {
-    return r.querySelector('.c > h3') && r.querySelector('.c > p');
-  });
-  function setOpen(r, open) {
-    r.classList.toggle('closed', !open);
-    r.querySelector('.tog').setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  var all = document.getElementById('tog-all');
-  function anyOpen() { return rows.some(function (r) { return !r.classList.contains('closed'); }); }
-  function sync() { all.setAttribute('aria-checked', anyOpen() ? 'true' : 'false'); }
-  rows.forEach(function (r, i) {
+  function makeToggle(r, i, onChange) {
     var h = r.querySelector('.c > h3');
     var b = document.createElement('button'); b.type = 'button'; b.className = 'tog';
     var lbl = document.createElement('span'); lbl.className = 'lbl';
@@ -782,11 +783,57 @@ footer{
     var ids = [];
     [].forEach.call(r.querySelectorAll('.c > p'), function (p, j) { p.id = p.id || 'detalj-' + i + '-' + j; ids.push(p.id); });
     b.setAttribute('aria-controls', ids.join(' '));
-    b.addEventListener('click', function () { setOpen(r, r.classList.contains('closed')); sync(); });
-    setOpen(r, false);                       /* everything starts closed: the overview first */
+    b.addEventListener('click', function () { setOpen(r, r.classList.contains('closed')); onChange(); });
+  }
+  function setOpen(r, open) {
+    r.classList.toggle('closed', !open);
+    r.querySelector('.tog').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  var n = 0;
+  [].forEach.call(document.querySelectorAll('#view-program section.day'), function (day) {
+    var head = day.querySelector('.dayhead'), h2 = head.querySelector('h2'), name = h2.textContent.trim();
+
+    /* 1. day name, date and tag become one button that folds the whole day away */
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'daytog';
+    btn.appendChild(document.createTextNode(name));
+    [].slice.call(head.querySelectorAll('.date, .tag')).forEach(function (el) { btn.appendChild(el); });
+    var dchev = document.createElement('span'); dchev.className = 'dchev'; dchev.setAttribute('aria-hidden', 'true'); dchev.textContent = '▾';
+    btn.appendChild(dchev);
+    h2.textContent = ''; h2.appendChild(btn);
+
+    var body = document.createElement('div'); body.className = 'daybody'; body.id = 'dag-' + day.id;
+    while (head.nextSibling) body.appendChild(head.nextSibling);
+    var all = body.querySelectorAll('.row');
+    var times = [].map.call(all, function (r) { var t = r.querySelector('.t'); return t ? t.textContent.trim() : ''; }).filter(Boolean);
+    var sum = document.createElement('p'); sum.className = 'daysum';
+    sum.textContent = all.length + ' punkter · ' + times[0] + '–' + times[times.length - 1];
+    day.appendChild(sum); day.appendChild(body);
+    btn.setAttribute('aria-controls', body.id);
+    function setDay(open) { day.classList.toggle('shut', !open); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+    btn.addEventListener('click', function () { setDay(day.classList.contains('shut')); });
+    day._setDay = setDay;
+    setDay(true);
+
+    /* 2. a switch per day for the details of that day's items */
+    var rows = [].slice.call(all).filter(function (r) { return r.querySelector('.c > h3') && r.querySelector('.c > p'); });
+    var sw = document.createElement('button'); sw.type = 'button'; sw.className = 'sw'; sw.setAttribute('role', 'switch');
+    sw.setAttribute('aria-label', 'Åpne eller lukke detaljene for ' + name.toLowerCase());
+    sw.innerHTML = '<span class="sw-lbl" aria-hidden="true">Åpne/lukke</span><span class="sw-track" aria-hidden="true"><span class="sw-knob"></span></span>';
+    head.appendChild(sw);
+    function anyOpen() { return rows.some(function (r) { return !r.classList.contains('closed'); }); }
+    function sync() { sw.setAttribute('aria-checked', anyOpen() ? 'true' : 'false'); }
+    rows.forEach(function (r) { makeToggle(r, n++, sync); setOpen(r, false); });
+    sw.addEventListener('click', function () { var open = !anyOpen(); rows.forEach(function (r) { setOpen(r, open); }); sync(); });
+    sync();
   });
-  all.addEventListener('click', function () { var open = !anyOpen(); rows.forEach(function (r) { setOpen(r, open); }); sync(); });
-  sync();
+
+  /* the Fredag / Lørdag / Søndag shortcuts unfold a day before jumping to it */
+  [].forEach.call(document.querySelectorAll('.daynav a'), function (a) {
+    a.addEventListener('click', function () {
+      var d = document.querySelector(a.getAttribute('href'));
+      if (d && d._setDay) d._setDay(true);
+    });
+  });
 })();
 </script>
 </body>
