@@ -526,6 +526,8 @@ footer{
     <span><span class="chip secret">?</span> du får se</span>
   </div>
 
+  <div class="togall"><button type="button" id="tog-all">Lukk alle</button></div>
+
   <section class="day" id="fredag">
     <div class="dayhead">
       <h2>Fredag</h2>
@@ -805,5 +807,59 @@ footer{
 })();
 </script>
 
+<style>
+.togall{display:flex;justify-content:flex-end;margin:-10px 0 18px}
+.togall button{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--wine);background:none;border:1px solid var(--rule);border-radius:3px;
+  padding:7px 12px;cursor:pointer;
+}
+.togall button:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+.row h3 .tog{
+  display:flex;align-items:baseline;gap:8px;width:100%;
+  margin:0;padding:0;border:0;background:none;color:inherit;
+  font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.row h3 .tog:focus-visible{outline:2px solid var(--wine);outline-offset:3px;border-radius:2px}
+.row h3 .tog .lbl{min-width:0}
+.row h3 .tog .chev{
+  margin-left:auto;flex:none;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);
+  transition:transform .15s ease;
+}
+.row.closed h3 .tog .chev{transform:rotate(-90deg)}
+.row.closed .c > p{display:none}
+.row.closed h3{margin-bottom:0}
+@media (prefers-reduced-motion:reduce){.row h3 .tog .chev{transition:none}}
+</style>
+<script>
+(function () {
+  /* every item with details gets its heading turned into a button that shows or hides them */
+  var rows = [].slice.call(document.querySelectorAll('#view-program .row')).filter(function (r) {
+    return r.querySelector('.c > h3') && r.querySelector('.c > p');
+  });
+  function setOpen(r, open) {
+    r.classList.toggle('closed', !open);
+    r.querySelector('.tog').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  var all = document.getElementById('tog-all');
+  function anyOpen() { return rows.some(function (r) { return !r.classList.contains('closed'); }); }
+  function sync() { all.textContent = anyOpen() ? 'Lukk alle' : 'Åpne alle'; }
+  rows.forEach(function (r, i) {
+    var h = r.querySelector('.c > h3');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tog';
+    var lbl = document.createElement('span'); lbl.className = 'lbl';
+    while (h.firstChild) lbl.appendChild(h.firstChild);
+    var chev = document.createElement('span'); chev.className = 'chev'; chev.setAttribute('aria-hidden', 'true'); chev.textContent = '▾';
+    b.appendChild(lbl); b.appendChild(chev); h.appendChild(b);
+    var ids = [];
+    [].forEach.call(r.querySelectorAll('.c > p'), function (p, j) { p.id = p.id || 'detalj-' + i + '-' + j; ids.push(p.id); });
+    b.setAttribute('aria-controls', ids.join(' '));
+    b.addEventListener('click', function () { setOpen(r, r.classList.contains('closed')); sync(); });
+    setOpen(r, true);
+  });
+  all.addEventListener('click', function () { var open = !anyOpen(); rows.forEach(function (r) { setOpen(r, open); }); sync(); });
+  sync();
+})();
+</script>
 </body>
 </html>
